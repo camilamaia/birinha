@@ -1,0 +1,18 @@
+name: Momento de Auto-Reflexão.
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+    - name: Setupa o Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.10.x
+    - name: Testa o próprio Birinha
+      uses: ./
+      with:
+        myInput: Birinha
