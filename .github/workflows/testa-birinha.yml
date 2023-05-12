@@ -8,11 +8,15 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v3
-    - name: Setupa o Python 3.10
-      uses: actions/setup-python@v3
-      with:
-        python-version: 3.10.x
+    - run: ls -la
     - name: Testa o próprio Birinha
       uses: ./
+      id: check
       with:
-        myInput: Birinha
+        trigger: '@deploy'
+        reaction: rocket
+      env:
+        GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+    - name: Find
+      run: 'echo Found it!'
+      if: steps.check.outputs.triggered == 'true'
