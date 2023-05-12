@@ -1,18 +1,78 @@
 name: Momento de Auto-Reflexão.
 
-on: [pull_request]
+on:
+  pull_request:
+    types: [opened]
+  issue_comment:
+    types: [created]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  apk:
+    runs-on: ubuntu-20.04
+    if: github.event.comment.body == 'Build test apk' && (github.actor == 'VishalNehra' || github.actor == 'TranceLove' || github.actor == 'EmmanuelMess' || github.actor == 'VishnuSanal')
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
-    - name: Setupa o Python 3.10
-      uses: actions/setup-python@v3
-      with:
-        python-version: 3.10.x
-    - name: Testa o próprio Birinha
-      uses: ./
-      with:
-        myInput: Birinha
+      - name: Github API Request
+        id: request
+        uses: octokit/request-action@v2.0.2
+        with:
+          route: ${{ github.event.issue.pull_request.url }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get PR informations
+        id: pr_data
+        run: |
+          echo "::set-output name=repo_name::${{ fromJson(steps.request.outputs.data).head.repo.full_name }}"
+          echo "::set-output name=repo_clone_url::${{ fromJson(steps.request.outputs.data).head.repo.clone_url }}"
+          echo "::set-output name=repo_ssh_url::${{ fromJson(steps.request.outputs.data).head.repo.ssh_url }}"
+      - name: Checkout PR Branch
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{fromJson(steps.request.outputs.data).head.repo.full_name}}
+          ref: ${{fromJson(steps.request.outputs.data).head.ref}}
+      - name: echo oi
+        run: echo "oi"
+
+# name: Momento de Auto-Reflexão.
+
+# on:
+#   pull_request:
+#   issue_comment:
+#     types: [created]
+
+# jobs:
+#   testa-birinha:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v3
+#       - name: Setupa o Python 3.10
+#         uses: actions/setup-python@v3
+#         with:
+#           python-version: 3.10.x
+#       - name: Github API Request
+#         id: request
+#         uses: octokit/request-action@v2.x
+#         with:
+#           route: ${{ github.event.issue.pull_request.url }}
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       - name: Get PR informations
+#         id: pr_data
+#         run: |
+#           echo "repo_name=${{ fromJson(steps.request.outputs.data).head.repo.full_name }}" >> $GITHUB_OUTPUT
+#           echo "repo_clone_url=${{ fromJson(steps.request.outputs.data).head.repo.clone_url }}" >> $GITHUB_OUTPUT
+#           echo "repo_ssh_url=${{ fromJson(steps.request.outputs.data).head.repo.ssh_url }}" >> $GITHUB_OUTPUT
+#       - name: Checkout PR Branch
+#         uses: actions/checkout@v2
+#         with:
+#           token: ${{ secrets.GITHUB_TOKEN }}
+#           repository: ${{ fromJson(steps.request.outputs.data).head.repo.full_name }}
+#           ref: ${{ steps.pr_data.outputs.branch }}
+#       - name: Testa o próprio Birinha
+#         uses: ./
+#         with:
+#           myInput: Birinha
+#         env:
+#           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           GITHUB_CONTEXT: ${{ toJson(github) }}
