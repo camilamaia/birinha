@@ -1,5 +1,5 @@
 name: "fala-birinha"
-description: "Seu assistente bacana"
+description: "Seu assistente em ação"
 author: "Camila Maia, Rodrigo Maia"
 inputs:
   myInput:
